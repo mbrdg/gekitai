@@ -1,8 +1,11 @@
 # Gekitai
 ## IA - L.EIC
 
-- Adversarial Search:
-        - Gekitai implementation and an AI for playing the game using the minimax algorithm.
+- IA first assignment.
+
+### Adversarial Search
+    1. Gekitai implementation
+    2. AI for playing the game using the minimax algorithm.
 
 ## Authors
 - [João Sousa](mailto:up201904739@edu.fc.up.pt)
