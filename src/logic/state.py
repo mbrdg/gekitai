@@ -13,7 +13,7 @@ class State:
     def __init__(self):
         self.board: list[list[Player | Empty]] = [[Empty for _ in range(6)] for _ in range(6)]
         self.player: Player = False
-        self.markers: tuple[int, int] = 8, 8
+        self.markers: list[int, int] = [8] * 2
         self.last_move: Position | Empty = Empty
 
 
@@ -101,7 +101,8 @@ def _push_piece(state: State, position: Position, mask: tuple[int, int, int, int
     if not 0 < i+i0 < 6 or not 0 < j+j0 < 6:
         return state
     if not 0 < i+i1 < 6 or not 0 < j+j1 < 6:
-        state.markers[state.board[i+i0][j+j0]] += 1
+        if state.board[i+i0][j+j0] is not Empty:
+            state.markers[state.board[i+i0][j+j0]] += 1
         state.board[i+i0][j+j0] = Empty
 
     if state.board[i+i1][j+j1] is not Empty:
