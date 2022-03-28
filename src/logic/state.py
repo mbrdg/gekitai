@@ -28,8 +28,6 @@ def actions(state: State) -> list[Position]:
 #
 #           - board[i+(-1)][j+0] -> the position in the line above;
 #           - board[i+(-2)][j+0] -> the position in the same column but 2 lines above;
-
-
 _masks = {(-1, 0, -2, 0), (-1, 1, -2, 2), (0, 1, 0, 2), (1, 1, 2, 2),
           (1, 0, 2, 0), (1, -1, 2, -2), (0, -1, 0, -2), (-1, -1, -2, -2)}
 
@@ -40,10 +38,10 @@ def is_over(state: State) -> bool:
     :param state: Current state of the game
     :return: True if the game is over, False otherwise
     """
-    if not state.markers[state.player]:
+    if not state.markers[not state.player]:
         return True
 
-    markers = [(i, j) for i, ln in enumerate(state.board) for j, elem in enumerate(ln) if elem is state.player]
+    markers = [(i, j) for i in range(6) for j in range(6) if state.board[i][j] is not (state.player or Empty)]
     for position in markers:
         if _position_has_win(state, position):
             return True
@@ -98,12 +96,13 @@ def _push_piece(state: State, position: Position, mask: tuple[int, int, int, int
     i, j = position
     i0, j0, i1, j1 = mask
 
-    if not 0 < i+i0 < 6 or not 0 < j+j0 < 6:
+    if not 0 <= i+i0 < 6 or not 0 <= j+j0 < 6:
         return state
-    if not 0 < i+i1 < 6 or not 0 < j+j1 < 6:
+    if not 0 <= i+i1 < 6 or not 0 <= j+j1 < 6:
         if state.board[i+i0][j+j0] is not Empty:
             state.markers[state.board[i+i0][j+j0]] += 1
         state.board[i+i0][j+j0] = Empty
+        return state
 
     if state.board[i+i1][j+j1] is not Empty:
         return state
