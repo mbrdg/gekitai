@@ -1,5 +1,5 @@
 from unittest import TestCase
-from state import *
+from src.logic.state import *
 
 
 class Test(TestCase):
