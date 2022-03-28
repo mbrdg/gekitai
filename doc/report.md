@@ -15,16 +15,19 @@ date:
 
 - The state of the game is represented by a **matrix of 6x6**.
 - The **initial state** is represented by an **empty matrix**.
-
+- Player's markers are represented by a boolean:
+    - `False` for player 1,
+    - `True` for player 2.
 
 > - An example of the state representation would be:
 ```python
-state = [[None,    1, None, None, None, None],
-         [None,    1, None,    2, None, None],
-         [None, None, None, None, None, None],
-         [None,    1,    2, None,    2, None],
-         [   2, None,    2, None, None,    1]]
+state = [[None, False, None, None, None,  None],
+         [None, False, None, True, None,  None],
+         [None,  None, None, None, None,  None],
+         [None, False, True, None, True,  None],
+         [True,  None, True, None, None, False]]
 ```
+
 
 ## Objective Test
 
