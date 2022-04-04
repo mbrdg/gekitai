@@ -13,15 +13,15 @@ date:
 
 ## State Representation
 
-- The state of the game is represented by a **matrix of 6x6**.
-- The **initial state** is represented by an **empty matrix**.
+- The state of the game is represented by a **matrix of 6x6** and some additional data (eg. current turn).
+- The **initial state** is represented by an **empty board**.
 - Player's markers are represented by a boolean:
     - `False` for player 1,
     - `True` for player 2.
 
-> - An example of the state representation would be:
+> - An example of the game's board representation would be:
 ```python
-state = [[None, False, None, None, None,  None],
+board = [[None, False, None, None, None,  None],
          [None, False, None, True, None,  None],
          [None,  None, None, None, None,  None],
          [None, False, True, None, True,  None],
