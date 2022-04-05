@@ -10,11 +10,11 @@ class State:
     State class that represents the state of the game.
     """
 
-    def __init__(self):
-        self.board: list[list[Player | Empty]] = [[Empty for _ in range(6)] for _ in range(6)]
+    def __init__(self, board_size: int = 6):
+        self.board_size = board_size
+        self.board: list[list[Player | Empty]] = [[Empty for _ in range(board_size)] for _ in range(board_size)]
         self.player: Player = False
         self.markers: list[int, int] = [8] * 2
-        self.last_move: Position | Empty = Empty
 
 
 def actions(state: State) -> list[Position]:
@@ -39,28 +39,32 @@ def is_over(state: State) -> bool:
     :return: True if the game is over, False otherwise
     """
     if not state.markers[not state.player]:
+        print(f'No more markers for player {int(not state.player) + 1}')
         return True
 
-    markers = [(i, j) for i in range(6) for j in range(6) if state.board[i][j] is not (state.player or Empty)]
+    s = state.board_size
+    markers = [(i, j) for i in range(s) for j in range(s) if state.board[i][j] is (not state.player)]
+
     for position in markers:
         if _position_has_win(state, position):
             return True
     return False
 
 
-def _position_has_win(state: State, position: Position) -> bool:
+def _position_has_win(state, position):
     for mask in _masks:
         if _position_against_mask(state, position, mask):
             return True
     return False
 
 
-def _position_against_mask(state: State, position: Position, mask: tuple[int, int, int, int]) -> bool:
+def _position_against_mask(state, position, mask):
+    s = state.board_size
     i, j = position
     i0, j0, i1, j1 = mask
 
     try:
-        if not (0 <= i+i0 < 6 and 0 <= j+j0 < 6 and 0 <= i+i1 < 6 and 0 <= j+j1 < 6):
+        if not (0 <= i+i0 < s and 0 <= j+j0 < s and 0 <= i+i1 < s and 0 <= j+j1 < s):
             raise IndexError
         return state.board[i][j] == state.board[i + i0][j + j0] == state.board[i + i1][j + j1]
     except IndexError:
@@ -79,26 +83,26 @@ def move(state: State, position: Position) -> State:
     if state.board[i][j] is not None:
         return state
 
-    state.last_move = position
     state.board[i][j] = state.player
     state.markers[state.player] -= 1
     state.player = not state.player
     return _push_pieces(state, position)
 
 
-def _push_pieces(state: State, position: Position) -> State:
+def _push_pieces(state, position):
     for mask in _masks:
         state = _push_piece(state, position, mask)
     return state
 
 
-def _push_piece(state: State, position: Position, mask: tuple[int, int, int, int]) -> State:
+def _push_piece(state, position, mask):
+    s = state.board_size
     i, j = position
     i0, j0, i1, j1 = mask
 
-    if not 0 <= i+i0 < 6 or not 0 <= j+j0 < 6:
+    if not 0 <= i+i0 < s or not 0 <= j+j0 < s:
         return state
-    if not 0 <= i+i1 < 6 or not 0 <= j+j1 < 6:
+    if not 0 <= i+i1 < s or not 0 <= j+j1 < s:
         if state.board[i+i0][j+j0] is not Empty:
             state.markers[state.board[i+i0][j+j0]] += 1
         state.board[i+i0][j+j0] = Empty
