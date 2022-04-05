@@ -2,7 +2,6 @@ from __future__ import annotations
 
 Player = bool
 Position = tuple[int, int]
-Empty = None
 
 
 class State:
@@ -12,9 +11,9 @@ class State:
 
     def __init__(self, board_size: int = 6):
         self.board_size = board_size
-        self.board: list[list[Player | Empty]] = [[Empty for _ in range(board_size)] for _ in range(board_size)]
+        self.board: list[list[Player | None]] = [[None for _ in range(board_size)] for _ in range(board_size)]
         self.player: Player = False
-        self.markers: list[int, int] = [8] * 2
+        self.markers: tuple[int, int] = (8, 8)
 
 
 def actions(state: State) -> list[Position]:
@@ -38,6 +37,7 @@ def is_over(state: State) -> bool:
     :param state: Current state of the game
     :return: True if the game is over, False otherwise
     """
+    print(state.markers)
     if not state.markers[not state.player]:
         print(f'No more markers for player {int(not state.player) + 1}')
         return True
@@ -84,8 +84,10 @@ def move(state: State, position: Position) -> State:
         return state
 
     state.board[i][j] = state.player
-    state.markers[state.player] -= 1
+    m, n = state.markers
+    state.markers = (m, n-1) if state.player else (m-1, n)
     state.player = not state.player
+
     return _push_pieces(state, position)
 
 
@@ -103,13 +105,14 @@ def _push_piece(state, position, mask):
     if not 0 <= i+i0 < s or not 0 <= j+j0 < s:
         return state
     if not 0 <= i+i1 < s or not 0 <= j+j1 < s:
-        if state.board[i+i0][j+j0] is not Empty:
-            state.markers[state.board[i+i0][j+j0]] += 1
-        state.board[i+i0][j+j0] = Empty
+        if state.board[i+i0][j+j0] is not None:
+            m, n = state.markers
+            state.markers = (m, n+1) if state.board[i+i0][j+j0] else (m+1, n)
+        state.board[i+i0][j+j0] = None
         return state
 
-    if state.board[i+i1][j+j1] is not Empty:
+    if state.board[i+i1][j+j1] is not None:
         return state
 
-    state.board[i+i0][j+j0], state.board[i+i1][j+j1] = Empty, state.board[i+i0][j+j0]
+    state.board[i+i0][j+j0], state.board[i+i1][j+j1] = None, state.board[i+i0][j+j0]
     return state

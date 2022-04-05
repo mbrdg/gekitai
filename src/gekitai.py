@@ -27,7 +27,7 @@ def render(game, screen):
 
 def main():
     pygame.init()
-    pygame.display.set_caption('Gekitai')
+    pygame.display.set_caption('G e k i t a i')
     screen = pygame.display.set_mode(size=(800, 800))
 
     game = logic.State()
