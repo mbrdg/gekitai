@@ -1,2 +1,2 @@
-from minimax import minimax
-from evaluators import *
+from .minimax import minimax
+from .evaluators import *

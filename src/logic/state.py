@@ -35,11 +35,12 @@ class GameState:
         self._markers = (x + delta, y) if player - 1 else (x, y + delta)
 
     def actions(self):
-        return np.argwhere(not self.board)
+        return np.argwhere(self.board == 0)
 
-    def is_over(self):
+    def is_over(self, verbose=False):
         if not self.get_markers(self.previous_player):
-            print(f"No more markers left for player {self.previous_player}.")
+            if verbose:
+                print(f"No more markers left for player {self.previous_player}.")
             return True
 
         markers = np.argwhere(self.board)
@@ -53,7 +54,8 @@ class GameState:
                 if not (0 <= i+i0 < s and 0 <= j+j0 < s and 0 <= i+i1 < s and 0 <= j+j1 < s):
                     continue
                 if self.board[i, j] == self.board[i+i0, j+j0] == self.board[i+i1, j+j1]:
-                    print(f"Player {self.previous_player} has 3 markers in a row.")
+                    if verbose:
+                        print(f"Player {self.previous_player} has 3 markers in a row.")
                     return True
 
         return False
