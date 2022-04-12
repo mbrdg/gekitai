@@ -38,21 +38,21 @@ board = [[None, False, None, None, None,  None],
 
 ## Operators
 
-- The rules of the game are pretty simple, thus we've just defined a single operator.
+- The [rules](https://boardgamegeek.com/boardgame/295449/gekitai) of the game are pretty simple, thus we've just defined a single operator.
 
 ---
 
 ### `move(curent_state, position)`
 
 - Arguments:
-    1. Current State - 6x6 matrix;
+    1. Current State;
     2. Position - pair of coordinates.
 
 - Preconditions:
-    1. `board[i][j] == None`
+    1. `state.board[i][j] == None`
 
 - Effects:
-    1. `board[i][j] = Player`
+    1. `state.board[i][j] = state.player`
     2. The neighbour markers might:
         1. Be pushed away from the new marker by one space if that same spot is
            empty;
@@ -60,7 +60,8 @@ board = [[None, False, None, None, None,  None],
            marker in the destination space;
         3. Be returned to the player if they fall out of the board after being
            pushed.
+    3. `state.player = not state.player`
 
 - Cost:
-    - `1`, all the moves have the same cost, possibly we want the algorithm to make the minimum number of moves possible.
+    - `1`, all the moves have the same cost, possibly we want a board evaluation that takes the minimum number of moves possible.
 

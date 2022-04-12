@@ -161,6 +161,7 @@ class Test(TestCase):
 
     def test_is_over_diagonal_down(self):
         state = State()
+        state.player = True
         state.board = [[None, None, None, None, None, None],
                        [None, None, True, None, None, None],
                        [None, False, True, False, None, None],
@@ -183,6 +184,7 @@ class Test(TestCase):
 
     def test_is_over_horizontal(self):
         state = State()
+        state.player = True
         state.board = [[None, None, None, None, True, None],
                        [None, None, None, None, None, None],
                        [None, False, False, False, None, None],
