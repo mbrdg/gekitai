@@ -18,10 +18,14 @@ class GameState:
     def __init__(self, size: int = 6):
         self.board = np.zeros(shape=(size, size), dtype=np.uint8)
         self.current_player, self.previous_player = 1, 2
+        self.last_move = None
         self._markers = (8, 8)
 
     def size(self):
         return self.board.shape[0]
+
+    def swap_player(self):
+        self.previous_player, self.current_player = self.current_player, self.previous_player
 
     def get_markers(self, player: int):
         return self._markers[player - 1]
@@ -29,9 +33,6 @@ class GameState:
     def set_markers(self, player: int, delta: int):
         x, y = self._markers
         self._markers = (x + delta, y) if player - 1 else (x, y + delta)
-
-    def swap_player(self):
-        self.previous_player, self.current_player = self.current_player, self.previous_player
 
     def actions(self):
         return np.argwhere(not self.board)
@@ -60,7 +61,8 @@ class GameState:
 
 def move(state, position):
     """
-    Executes a move given a position - note that the state knows who is the current player
+    Executes a move given a position
+    ---
     :param state: Current state of the game
     :param position: Position where the current player wants to place its marker
     :return: The new state of the game with the corresponding post-conditions applied
@@ -73,6 +75,7 @@ def move(state, position):
     state.board[i, j] = state.current_player
     state.set_markers(player=state.current_player - 1, delta=-1)
     state.swap_player()
+    state.last_move = position
 
     # Pieces pushing
     for mask in MASKS:
