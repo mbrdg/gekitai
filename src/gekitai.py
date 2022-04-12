@@ -9,15 +9,15 @@ def loop(state, ev, surface):
     if ev.type == pygame.MOUSEBUTTONUP:
         mx, my = pygame.mouse.get_pos()
 
-        size = surface.get_width() / len(state.board)
-        j, i = int((my / size) % len(state.board)), int((mx / size) % len(state.board))
+        size = surface.get_width() / state.board.shape[0]
+        j, i = int((my / size) % state.board.shape[0]), int((mx / size) % state.board.shape[0])
 
         state = logic.move(state, position=(i, j))
     return state
 
 
 def render(game, screen):
-    board = ui.draw_board(game.board_size)
+    board = ui.draw_board(game.board.shape[0])
     ui.draw_pieces(game, board)
     screen.blit(board, board.get_rect())
     pygame.display.update()
