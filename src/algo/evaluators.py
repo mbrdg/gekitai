@@ -23,52 +23,41 @@ def _neighbours(state, position, layers=1):
     return state.board[left:right, bottom:top]
 
 
-def all_no_opponent(game, is_max):
-    score = game.get_markers(game.current_player)
-
-    # Working in a negamax fashion
-    return score if is_max else -score
+def all_no_opponent(game):
+    return game.get_markers(game.previous_player)
 
 
-def all_(game, is_max):
-    max_player = game.current_player if is_max else game.previous_player
-    min_player = game.previous_player if is_max else game.current_player
-
-    return game.get_markers(max_player) - game.get_markers(min_player)
+def all_(game):
+    return game.get_markers(game.previous_player) - game.get_markers(game.current_player)
 
 
-def consecutive_no_opponent(game, is_max):
-    player = game.current_player if is_max else game.previous_player
-    markers = np.argwhere(game.board == player)
+def consecutive_no_opponent(game):
+    markers = np.argwhere(game.board == game.previous_player)
     score = 0
 
     for m in markers:
         board = _neighbours(game, m, layers=1)
-        score += np.count_nonzero(board == game.current_player)
-
-    # Working in a negamax fashion
-    return score if is_max else -score
-
-
-def consecutive(game, is_max):
-    max_player = game.current_player if is_max else game.previous_player
-    min_player = game.previous_player if is_max else game.current_player
-
-    max_markers = np.argwhere(game.board == max_player)
-    min_markers = np.argwhere(game.board == min_player)
-    score = 0
-
-    for m in max_markers:
-        board = _neighbours(game, m, layers=1)
-        score += np.count_nonzero(board == game.current_player)
-
-    for m in min_markers:
-        board = _neighbours(game, m, layers=1)
-        score -= np.count_nonzero(board == game.previous_player)
+        score += np.count_nonzero(board == game.previous_player)
 
     return score
 
 
-def mix(game, is_max, consecutive_height=1.25, all_height=1.0):
+def consecutive(game):
+    max_player_markers = np.argwhere(game.board == game.previous_player)
+    min_player_markers = np.argwhere(game.board == game.current_player)
+    score = 0
+
+    for m in max_player_markers:
+        board = _neighbours(game, m, layers=1)
+        score += np.count_nonzero(board == game.previous_player)
+
+    for m in min_player_markers:
+        board = _neighbours(game, m, layers=1)
+        score -= np.count_nonzero(board == game.current_player)
+
+    return score
+
+
+def mix(game, consecutive_height=1.5, all_height=1.0):
     # TODO: Create an heuristic that changes the heights on the fly
-    return consecutive_height * consecutive(game, is_max) + all_height * all_(game, is_max)
+    return consecutive_height * consecutive(game) + all_height * all_(game)

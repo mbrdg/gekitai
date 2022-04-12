@@ -7,7 +7,8 @@ from algo import *
 
 def loop(game, view, is_pc):
     if is_pc:
-        _, mv = minimax(game, mix, depth=8, is_max=True)  # FIXME: mv is None
+        _, mv = minimax(game, mix, depth=3)
+        print(f"Executed move ({mv[0]}, {mv[1]})")
     else:
         mv = view.read_mouse_pos()
 
@@ -39,7 +40,7 @@ def main():
                 running = False
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 game = loop(game, view, is_pc)
-                is_pc = False
+                is_pc = True
 
         if game.is_over(verbose=True):
             print(f'Game Over! Player {game.previous_player} won!')

@@ -1,9 +1,10 @@
 import numpy as np
+from copy import deepcopy
 
 from src.logic import *
 
 
-def minimax(game, evaluator, depth, is_max, alpha=np.PINF, beta=np.NINF):
+def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
     """
     Minimax algorithm implementation with alpha-beta cuts
     ---
@@ -17,27 +18,31 @@ def minimax(game, evaluator, depth, is_max, alpha=np.PINF, beta=np.NINF):
     """
 
     if not depth or game.is_over():
-        return evaluator(game, is_max), game.last_move
+        return evaluator(game), game.last_move
 
-    v, mv = np.PINF if is_max else np.NINF, None
+    if is_max:
+        max_v, best_mv = np.NINF, None
+        for action in game.actions():
+            game_state = deepcopy(game)  # FIXME: copy is expensive
+            child = move(game_state, action)
+            del game_state
 
-    for action in game.actions():
-        child = move(game, action)
-
-        if is_max:
-            max_v, max_m = minimax(child, evaluator, depth - 1, False, alpha, beta)
-            v, mv = max(v, max_v), max_m if max_v > v else mv
-            alpha = max(alpha, v)
+            v, mv = minimax(child, evaluator, depth - 1, False, alpha, beta)
+            max_v, best_mv = max(max_v, v), action if v > max_v else best_mv
 
             if beta <= alpha:
                 break
+        return max_v, best_mv
 
-        else:
-            min_v, min_m = minimax(child, evaluator, depth - 1, True, alpha, beta)
-            v, mv = min(v, min_v), min_m if min_v < v else mv
-            beta = min(beta, v)
+    else:
+        min_v, best_mv = np.PINF, None
+        for action in game.actions():
+            game_state = deepcopy(game)
+            child = move(game_state, action)
 
-            if alpha <= beta:
+            v, mv = minimax(child, evaluator, depth - 1, True, alpha, beta)
+            min_v, best_mv = min(min_v, v), action if v < min_v else best_mv
+
+            if beta <= alpha:
                 break
-
-    return v, mv
+        return min_v, best_mv
