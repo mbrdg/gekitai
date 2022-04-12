@@ -1,36 +1,54 @@
-import pygame.draw
-
-GREY = pygame.Color('GREY')
-WHITE = pygame.Color('WHITE')
-RED = pygame.Color('RED')
-BLUE = pygame.Color('BLUE')
+import numpy as np
+import pygame as pg
 
 
-def draw_board(n: int):
-    ts = 800 / n
-    bg = pygame.Surface((n * ts, n * ts))
-    bg.fill(GREY)
+class GameView:
 
-    for x in range(0, n):
-        for y in range(x % 2, n, 2):
-            pygame.draw.rect(bg, WHITE, (x * ts, y * ts, ts, ts))
-    return bg
+    _GREY = pg.Color('GREY')
+    _WHITE = pg.Color('WHITE')
+    _RED = pg.Color('RED')
+    _BLUE = pg.Color('BLUE')
 
+    def __init__(self, state, screen):
+        self._state = state
+        self._screen = screen
 
-def draw_pieces(game, board):
-    ts = 800 / game.board_size
+    @property
+    def state(self):
+        return self._state
 
-    for x, ln in enumerate(game.board):
-        for y, marker in enumerate(ln):
-            _draw_piece(board, marker, size=ts, position=(x, y))
+    @state.setter
+    def state(self, state):
+        self._state = state
 
+    def render(self):
+        board, ts = self._render_board()
+        self._render_pieces(board, ts)
+        self._screen.blit(board, board.get_rect())
+        pg.display.update()
 
-def _draw_piece(surface, marker, size, position):
-    if marker is None:
-        return
+        return board
 
-    color = RED if marker else BLUE
-    radius = size * 0.385
-    x, y = position
-    x, y = (x + 0.5) * size, (y + 0.5) * size
-    pygame.draw.circle(surface, color, (x, y), radius)
+    def _render_board(self):
+        n = self.state.size()
+        ts = self._screen.get_width() / n
+
+        bg = pg.Surface((ts * n, ts * n))
+        bg.fill(self._WHITE)
+
+        for x in range(0, n):
+            for y in range(x % 2, n, 2):
+                pg.draw.rect(bg, self._GREY, (x * ts, y * ts, ts, ts))
+        return bg, ts
+
+    def _render_pieces(self, board, ts):
+        pieces = np.argwhere(self.state.board)
+
+        for position in pieces:
+            i, j = position[0], position[1]
+            marker = self.state.board[i, j]
+            color = self._BLUE if marker == 1 else self._RED
+
+            radius = ts * .385
+            x, y = (i + .5) * ts, (j + .5) * ts
+            pg.draw.circle(board, color, (x, y), radius)
