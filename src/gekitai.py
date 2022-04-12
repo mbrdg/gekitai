@@ -1,53 +1,44 @@
-import pygame
-import time
+import pygame as pg
 
-import logic.state
-import ui.ui
-
-
-def loop(state, ev, surface):
-    if ev.type == pygame.MOUSEBUTTONUP:
-        mx, my = pygame.mouse.get_pos()
-
-        size = surface.get_width() / state.board.shape[0]
-        j, i = int((my / size) % state.board.shape[0]), int((mx / size) % state.board.shape[0])
-
-        state = logic.move(state, position=(i, j))
-    return state
+from logic import *
+from ui import *
 
 
-def render(game, screen):
-    board = ui.draw_board(game.board.shape[0])
-    ui.draw_pieces(game, board)
-    screen.blit(board, board.get_rect())
-    pygame.display.update()
+def loop(game, surface):
+    mx, my = pg.mouse.get_pos()
+    size = surface.get_width() / game.size()
+    j, i = int((my / size) % game.size()), int((mx / size) % game.size())
 
-    return board
+    return move(game, position=(i, j))
 
 
 def main():
-    pygame.init()
-    pygame.display.set_caption('G e k i t a i')
-    screen = pygame.display.set_mode(size=(800, 800))
+    pg.init()
+    pg.display.set_caption('G e k i t a i')
+    pg.event.set_allowed([pg.QUIT, pg.MOUSEBUTTONUP])
 
-    game = logic.State()
+    screen = pg.display.set_mode(size=(800, 800))
+
+    game = GameState()
+    view = GameView(game, screen)
 
     running = True
     while running:
+        board = view.render()
 
-        board = render(game, screen)
-        event = pygame.event.wait()
-        if event.type == pygame.QUIT:
+        event = pg.event.wait()
+        if event.type == pg.QUIT:
             running = False
+        elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+            game = loop(game, board)
 
-        game = loop(game, event, board)
-        if logic.is_over(game):
-            _ = render(game, screen)
-            print(f'Game Over! Player {int(not game.player) + 1} won!')
-            running = False
-            time.sleep(10)
+            if game.is_over():
+                print(f'Game Over! Player {game.previous_player} won!')
+                _ = view.render()
+                pg.time.wait(3500)
+                running = False
 
-    pygame.quit()
+    pg.quit()
 
 
 if __name__ == '__main__':

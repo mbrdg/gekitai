@@ -1,2 +1,1 @@
-from .ui import draw_board
-from .ui import draw_pieces
+from .ui import GameView

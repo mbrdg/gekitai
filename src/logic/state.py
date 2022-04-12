@@ -1,80 +1,60 @@
 import numpy as np
 
-
-class State:
-    def __init__(self, board_size: int = 6):
-        self.board = np.zeros(shape=(board_size, board_size), dtype='b')
-        self._markers = (8, 8)
-        self.player = 1
-
-    def get_board_size(self):
-        return self.board.shape[0]
-
-    def get_markers(self, i: int):
-        return self._markers[i]
-
-    def set_markers(self, i: int, delta: int):
-        x, y = self._markers
-        self._markers = (x + delta, y) if i else (x, y + delta)
-
-    def swap_player(self):
-        self.player = 2 if self.player == 1 else 1
-
-    def actions(self):
-        return np.argwhere(self.board == 0)
-
-
 # These masks represent the offsets in each direction of the board.
 # They allow to generalize the searching code for both winning moves
 # or pushing pieces for all the 8 possible directions.
 #
-# Example: (-1, 0, -2, 0) means that for a given board[i][j],
+# Example: (-1, 0, -2, 0) means that for a given board[i, j],
 # their neighbours which will be visited are:
 #
 #   - board[i+(-1), j+0] -> the position in the line above;
 #   - board[i+(-2), j+0] -> the position in the same column but 2 lines above;
-_masks = {(-1, +0, -2, +0), (-1, +1, -2, +2), (+0, +1, +0, +2), (+1, +1, +2, +2),
-          (+1, +0, +2, +0), (+1, -1, +2, -2), (+0, -1, +0, -2), (-1, -1, -2, -2)}
+MASKS = {(-1, +0, -2, +0), (-1, +1, -2, +2), (+0, +1, +0, +2), (+1, +1, +2, +2),
+         (+1, +0, +2, +0), (+1, -1, +2, -2), (+0, -1, +0, -2), (-1, -1, -2, -2)}
 
 
-def is_over(state: State) -> bool:
-    """
-    Determines whether the game is over
-    :param state: Current state of the game
-    :return: True if the game is over, False otherwise
-    """
-    if not state.get_markers(i=state.player - 1):
-        print(f'No more markers for player {state.player - 1}')
-        return True
+class GameState:
 
-    markers = np.argwhere(state.board)
-    if not markers.size:
-        return False
+    def __init__(self, size: int = 6):
+        self.board = np.zeros(shape=(size, size), dtype=np.uint8)
+        self.current_player, self.previous_player = 1, 2
+        self._markers = (8, 8)
 
-    for position in markers:
-        if _position_has_win(state, position):
+    def size(self):
+        return self.board.shape[0]
+
+    def get_markers(self, player: int):
+        return self._markers[player - 1]
+
+    def set_markers(self, player: int, delta: int):
+        x, y = self._markers
+        self._markers = (x + delta, y) if player - 1 else (x, y + delta)
+
+    def swap_player(self):
+        self.previous_player, self.current_player = self.current_player, self.previous_player
+
+    def actions(self):
+        return np.argwhere(not self.board)
+
+    def is_over(self):
+        if not self.get_markers(self.previous_player):
+            print(f"No more markers left for player {self.previous_player}.")
             return True
-    return False
 
+        markers = np.argwhere(self.board)
 
-def _position_has_win(state, position):
-    for mask in _masks:
-        if _position_against_mask(state, position, mask):
-            return True
-    return False
+        for position in markers:
+            for mask in MASKS:
+                s = self.board.shape[0]
+                i, j = position[0], position[1]
+                i0, j0, i1, j1 = mask
 
+                if not (0 <= i+i0 < s and 0 <= j+j0 < s and 0 <= i+i1 < s and 0 <= j+j1 < s):
+                    continue
+                if self.board[i, j] == self.board[i+i0, j+j0] == self.board[i+i1, j+j1]:
+                    print(f"Player {self.previous_player} has 3 markers in a row.")
+                    return True
 
-def _position_against_mask(state, position, mask):
-    s = state.get_board_size()
-    print(position)
-    i, j = position[0], position[1]
-    i0, j0, i1, j1 = mask
-
-    try:
-        if not (0 <= i+i0 < s and 0 <= j+j0 < s and 0 <= i+i1 < s and 0 <= j+j1 < s):
-            raise IndexError
-        return state.board[i, j] == state.board[i+i0, j+j0] == state.board[i+i1, j+j1]
-    except IndexError:
         return False
 
 
@@ -90,34 +70,35 @@ def move(state, position):
     if state.board[i, j]:
         return state
 
-    state.board[i, j] = state.player
-    state.set_markers(i=state.player - 1, delta=-1)
+    state.board[i, j] = state.current_player
+    state.set_markers(player=state.current_player - 1, delta=-1)
     state.swap_player()
 
-    return _push_pieces(state, position)
-
-
-def _push_pieces(state, position):
-    for mask in _masks:
+    # Pieces pushing
+    for mask in MASKS:
         state = _push_piece(state, position, mask)
     return state
 
 
 def _push_piece(state, position, mask):
-    s = state.get_board_size()
+    s = state.size()
     i, j = position
     i0, j0, i1, j1 = mask
 
-    if not 0 <= i+i0 < s or not 0 <= j+j0 < s:
+    # Adjacent cell is outside the board
+    if not (0 <= i+i0 < s and 0 <= j+j0 < s):
         return state
 
-    if not 0 <= i+i1 < s or not 0 <= j+j1 < s:
+    # A markers gets dropped out of the board
+    if not (0 <= i+i1 < s and 0 <= j+j1 < s):
         if state.board[i+i0, j+j0]:
-            k = state.board[i+i0, j+j0] - 1
-            state.set_markers(i=k, delta=1)
+            player = state.board[i+i0, j+j0] - 1
+            state.set_markers(player=player, delta=1)
+
         state.board[i+i0, j+j0] = 0
         return state
 
+    # Can't push the piece on the opposite side
     if state.board[i+i1, j+j1]:
         return state
 
