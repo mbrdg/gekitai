@@ -1,14 +1,17 @@
 import pygame as pg
+from time import perf_counter
 
-from logic import *
-from ui import *
-from algo import *
+from logic import GameState, move
+from ui import GameView
+from algo import minimax, evaluators
 
 
 def loop(game, view, is_pc):
     if is_pc:
-        _, mv = minimax(game, mix, depth=3)
-        print(f"Executed move ({mv[0]}, {mv[1]})")
+        start = perf_counter()
+        _, mv = minimax(game, evaluators.mix, depth=3)
+        elapsed = perf_counter() - start
+        print(f"Minimax: Executed move ({mv[0]}, {mv[1]}), took {elapsed:.2f} secs")
     else:
         mv = view.read_mouse_pos()
 
@@ -42,7 +45,7 @@ def main():
                 game = loop(game, view, is_pc)
                 is_pc = True
 
-        if game.is_over(verbose=True):
+        if game.is_over():
             print(f'Game Over! Player {game.previous_player} won!')
             pg.time.wait(3500)
             running = False

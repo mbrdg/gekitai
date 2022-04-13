@@ -1,7 +1,7 @@
 import numpy as np
-from copy import deepcopy
+import pickle
 
-from src.logic import *
+from src.logic import move
 
 
 def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
@@ -20,12 +20,12 @@ def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
     if not depth or game.is_over():
         return evaluator(game), game.last_move
 
+    parent = pickle.dumps(game, protocol=-1)
     if is_max:
         max_v, best_mv = np.NINF, None
         for action in game.actions():
-            game_state = deepcopy(game)  # FIXME: copy is expensive
-            child = move(game_state, action)
-            del game_state
+            child = pickle.loads(parent)
+            child = move(child, action)
 
             v, mv = minimax(child, evaluator, depth - 1, False, alpha, beta)
             max_v, best_mv = max(max_v, v), action if v > max_v else best_mv
@@ -37,8 +37,8 @@ def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
     else:
         min_v, best_mv = np.PINF, None
         for action in game.actions():
-            game_state = deepcopy(game)
-            child = move(game_state, action)
+            child = pickle.loads(parent)
+            child = move(child, action)
 
             v, mv = minimax(child, evaluator, depth - 1, True, alpha, beta)
             min_v, best_mv = min(min_v, v), action if v < min_v else best_mv
