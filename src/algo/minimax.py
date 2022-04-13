@@ -1,5 +1,5 @@
 import numpy as np
-import pickle
+from copy import deepcopy
 
 from src.logic import move
 
@@ -18,16 +18,16 @@ def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
     """
 
     if not depth or game.is_over():
-        return evaluator(game), game.last_move
+        is_over = bool(depth)  # if depth is not 0 this condition is triggered by game.is_over()
+        return evaluator(game, is_over, is_max), game.last_move
 
-    parent = pickle.dumps(game, protocol=-1)
     if is_max:
         max_v, best_mv = np.NINF, None
         for action in game.actions():
-            child = pickle.loads(parent)
+            child = deepcopy(game)
             child = move(child, action)
 
-            v, mv = minimax(child, evaluator, depth - 1, False, alpha, beta)
+            v, _ = minimax(child, evaluator, depth - 1, False, alpha, beta)
             max_v, best_mv = max(max_v, v), action if v > max_v else best_mv
 
             if beta <= alpha:
@@ -37,10 +37,10 @@ def minimax(game, evaluator, depth, is_max=True, alpha=np.NINF, beta=np.PINF):
     else:
         min_v, best_mv = np.PINF, None
         for action in game.actions():
-            child = pickle.loads(parent)
+            child = deepcopy(game)
             child = move(child, action)
 
-            v, mv = minimax(child, evaluator, depth - 1, True, alpha, beta)
+            v, _ = minimax(child, evaluator, depth - 1, True, alpha, beta)
             min_v, best_mv = min(min_v, v), action if v < min_v else best_mv
 
             if beta <= alpha:
