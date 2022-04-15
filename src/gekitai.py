@@ -3,15 +3,17 @@ from time import perf_counter
 
 from logic import GameState, move
 from ui import GameView
-from algo import minimax, evaluators
+from algo import minimax, mcts, evaluators
 
 
 def loop(game, view, is_pc):
     if is_pc:
         start = perf_counter()
-        _, mv = minimax(game, evaluators.evaluator, depth=3)
+        # _, mv = minimax(game, evaluators.evaluator, depth=3)
+        mv = mcts(game, iterations=2000)
         elapsed = perf_counter() - start
-        print(f"Minimax: Executed move ({mv[0]}, {mv[1]}), took {elapsed:.2f} secs")
+        # print(f"Minimax: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
+        print(f"MCTS: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
     else:
         mv = view.read_mouse_pos()
 
@@ -45,8 +47,9 @@ def main():
                 game = loop(game, view, is_pc)
                 is_pc = True
 
-        if game.is_over(verbose=True):
-            print(f'Game Over! Player {game.prev_player} won!')
+        is_over, winner = game.is_over(verbose=True)
+        if is_over:
+            print(f'Game Over! Player {winner} won!')
             pg.time.wait(3500)
             running = False
 

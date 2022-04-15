@@ -5,14 +5,13 @@ from src.logic.state import move
 
 
 class Node:
-
-    C = 2  # Constant for calculating UCB1
+    C = 2  # const required for UCB1 formula
 
     def __init__(self, state, parent=None):
         self.state = state
         self.parent = parent
-        self.t = 0
-        self.n = 0
+        self.t = 0  # no. of wins
+        self.n = 0  # no. of visits
         self.children = None
 
     def ucb1(self):
@@ -26,45 +25,51 @@ class Node:
     def get_root(self):
         node = self
         while node.parent is not None:
-            node = self.parent
+            node = node.parent
         return node
 
     def is_expanded(self):
-        return bool(self.children)
+        return self.children is not None
 
     def expand(self):
         actions = self.state.actions()
-        self.children = np.empty(shape=(1, len(actions)), dtype=object)
+        self.children = np.empty(shape=actions.shape[0], dtype=Node)
 
         for i, action in enumerate(actions):
             child = deepcopy(self.state)
             self.children[i] = Node(move(child, action), self)
 
     def best_child(self):
-        values = np.empty(shape=self.children.shape, dtype=np.float32)
+        values = np.empty(shape=self.children.shape[0], dtype=np.float32)
         for i, child in enumerate(self.children):
             values[i] = child.ucb1()
 
-        return self.children[np.argmax(values)[0]]
+        return self.children[np.argmax(values)]
 
-    def rollout(self, evaluator):
+    def rollout(self):
         game = deepcopy(self.state)
-        while not game.is_over():
-            random_move = np.random.choice(game.actions(), size=1)
-            game = move(game, random_move)
-        return evaluator(game, is_over=True, is_max=True)
-
-    def back_propagate(self, value):
-        p = self
 
         while True:
-            p.t = value
+            is_over, winner = game.is_over()
+            if is_over:
+                return int(winner == self.get_root().state.curr_player)
+
+            actions = game.actions()
+            random_move = np.random.randint(0, actions.shape[0], dtype=np.uint8)
+            game = move(game, actions[random_move])
+
+    def back_propagate(self, value):
+        self.t += value
+        self.n += 1
+
+        p = self.parent
+        while p is not None:
+            p.t += value
             p.n += 1
-            if p.parent is None:
-                break
+            p = p.parent
 
 
-def mcts(game, evaluator, iterations=100):
+def mcts(game, iterations=100):
     root = Node(game)
 
     for _ in range(iterations):
@@ -77,7 +82,8 @@ def mcts(game, evaluator, iterations=100):
             current.expand()
             current = current.best_child()
 
-        value = current.rollout(evaluator)
+        value = current.rollout()
         current.back_propagate(value)
 
+    print(f"MCTS value of the chosen node: {root.best_child().t, root.best_child().n}")
     return root.best_child().state.last_move

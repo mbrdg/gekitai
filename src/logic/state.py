@@ -42,15 +42,15 @@ class GameState:
         if not self.get_markers(self.prev_player):
             if verbose:
                 print(f"No more markers left for player {self.prev_player}.")
-            return True
+            return True, self.prev_player
 
         kernels = [np.ones(shape=(1, 3)), np.ones(shape=(3, 1)), np.eye(3), np.fliplr(np.eye(3))]
         for kernel in kernels:
             if (convolve2d(self.board == self.prev_player, kernel, mode='valid') == 3).any():
-                if verbose:
-                    print(f"Player {self.prev_player} has 3 markers in a row.")
-                return True
-        return False
+                return True, self.prev_player
+            if (convolve2d(self.board == self.curr_player, kernel, mode='valid') == 3).any():
+                return True, self.curr_player
+        return False, None
 
 
 def move(state, position):
