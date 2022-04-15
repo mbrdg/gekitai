@@ -4,8 +4,8 @@ from copy import deepcopy
 from src.logic.state import move
 
 
-class Node:
-    C = 2  # const required for UCB1 formula
+class MCTSNode:
+    """ Node representation for the Monte Carlo Tree Search Algorithm """
 
     def __init__(self, state, parent=None):
         self.state = state
@@ -14,13 +14,12 @@ class Node:
         self.n = 0  # no. of visits
         self.children = None
 
-    def ucb1(self):
-        """Upper confidence value of a state -- UCB1"""
+    def ucb1(self, c=2):
         if self.n == 0:
             return np.inf
 
         root = self.get_root()
-        return (self.t / self.n) + Node.C * np.sqrt(np.log(root.n) / self.n)
+        return (self.t / self.n) + c * np.sqrt(np.log(root.n) / self.n)
 
     def get_root(self):
         node = self
@@ -33,11 +32,11 @@ class Node:
 
     def expand(self):
         actions = self.state.actions()
-        self.children = np.empty(shape=actions.shape[0], dtype=Node)
+        self.children = np.empty(shape=actions.shape[0], dtype=MCTSNode)
 
         for i, action in enumerate(actions):
             child = deepcopy(self.state)
-            self.children[i] = Node(move(child, action), self)
+            self.children[i] = MCTSNode(move(child, action), self)
 
     def best_child(self):
         values = np.empty(shape=self.children.shape[0], dtype=np.float32)
@@ -46,7 +45,7 @@ class Node:
 
         return self.children[np.argmax(values)]
 
-    def rollout(self):
+    def simulate(self):
         game = deepcopy(self.state)
 
         while True:
@@ -58,7 +57,7 @@ class Node:
             random_move = np.random.randint(0, actions.shape[0], dtype=np.uint8)
             game = move(game, actions[random_move])
 
-    def back_propagate(self, value):
+    def propagate(self, value):
         self.t += value
         self.n += 1
 
@@ -69,21 +68,30 @@ class Node:
             p = p.parent
 
 
-def mcts(game, iterations=100):
-    root = Node(game)
+def mcts(game, iterations=1000):
+    """
+    A very basic Monte Carlo Tree Search Algorithm Implementation
+    ---
+    :param game: Current game state
+    :param iterations: Number of iterations to run the algorithm
+    :return: Most promising move according to the algorith
+    """
 
+    root = MCTSNode(game)
     for _ in range(iterations):
         current = root
 
+        # Selection
         while current.is_expanded():
             current = current.best_child()
 
+        # Expansion
         if current.n:
             current.expand()
             current = current.best_child()
 
-        value = current.rollout()
-        current.back_propagate(value)
+        # Simulation and back propagation
+        value = current.simulate()
+        current.propagate(value)
 
-    print(f"MCTS value of the chosen node: {root.best_child().t, root.best_child().n}")
     return root.best_child().state.last_move

@@ -15,12 +15,13 @@ MASKS = {(-1, +0, -2, +0), (-1, +1, -2, +2), (+0, +1, +0, +2), (+1, +1, +2, +2),
 
 
 class GameState:
+    """ State representation for the 'Gekitai' game """
 
-    def __init__(self, size: int = 6):
+    def __init__(self, size=6, markers=8):
         self.board = np.zeros(shape=(size, size), dtype=np.uint8)
         self.curr_player, self.prev_player = 1, 2
         self.last_move = None
-        self._markers = (8, 8)
+        self._markers = (markers, markers)
 
     def size(self):
         return self.board.shape[0]
