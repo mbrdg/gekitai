@@ -2,7 +2,7 @@ import numpy as np
 from scipy.signal import convolve2d
 
 
-def evaluator(game, is_over, is_max):
+def board_evaluation(game, is_over, is_max):
     """ Evaluator function for the board """
 
     # If the game is over just return the best value according to the game winner

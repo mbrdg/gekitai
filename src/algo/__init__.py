@@ -1,2 +1,4 @@
 from .minimax import minimax
-from .evaluators import *
+from .mcts import mcts
+
+from .evaluators import board_evaluation
