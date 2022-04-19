@@ -10,18 +10,18 @@ class MCTSNode:
     def __init__(self, state, parent=None):
         self.state = state
         self.parent = parent
-        self.t = 0  # no. of wins
-        self.n = 0  # no. of visits
         self.children = None
+        self.wins = 0
+        self.visits = 0
 
-    def ucb1(self, c=2):
-        if self.n == 0:
+    def ucb1(self, ci=2):
+        if self.visits == 0:
             return np.inf
 
-        root = self.get_root()
-        return (self.t / self.n) + c * np.sqrt(np.log(root.n) / self.n)
+        root = self.root()
+        return (self.wins / self.visits) + ci * np.sqrt(np.log(root.visits) / self.visits)
 
-    def get_root(self):
+    def root(self):
         node = self
         while node.parent is not None:
             node = node.parent
@@ -36,12 +36,12 @@ class MCTSNode:
 
         for i, action in enumerate(actions):
             child = deepcopy(self.state)
-            self.children[i] = MCTSNode(move(child, action), self)
+            self.children[i] = MCTSNode(move(child, action), parent=self)
 
-    def best_child(self):
+    def best_child(self, ci):
         values = np.empty(shape=self.children.shape[0], dtype=np.float32)
         for i, child in enumerate(self.children):
-            values[i] = child.ucb1()
+            values[i] = child.ucb1(ci)
 
         return self.children[np.argmax(values)]
 
@@ -51,29 +51,31 @@ class MCTSNode:
         while True:
             is_over, winner = game.is_over()
             if is_over:
-                return int(winner == self.get_root().state.curr_player)
+                return int(winner == self.root().state.curr_player)
 
             actions = game.actions()
             random_move = np.random.randint(0, actions.shape[0], dtype=np.uint8)
             game = move(game, actions[random_move])
 
     def propagate(self, value):
-        self.t += value
-        self.n += 1
+        self.wins += value
+        self.visits += 1
 
         p = self.parent
         while p is not None:
-            p.t += value
-            p.n += 1
+            p.wins += value
+            p.visits += 1
             p = p.parent
 
 
-def mcts(game, iterations=1000):
+def mcts(game, *, iterations=1024, ci=2):
     """
     A very basic Monte Carlo Tree Search Algorithm Implementation
+    The value of the nodes is based in wins and visits ratio
     ---
     :param game: Current game state
     :param iterations: Number of iterations to run the algorithm
+    :param ci: Exploration parameter for UCB1
     :return: Most promising move according to the algorith
     """
 
@@ -83,15 +85,15 @@ def mcts(game, iterations=1000):
 
         # Selection
         while current.is_expanded():
-            current = current.best_child()
+            current = current.best_child(ci)
 
         # Expansion
-        if current.n:
+        if current.visits > 0:
             current.expand()
-            current = current.best_child()
+            current = current.best_child(ci)
 
         # Simulation and back propagation
         value = current.simulate()
         current.propagate(value)
 
-    return root.best_child().state.last_move
+    return root.best_child(ci).state.last_move

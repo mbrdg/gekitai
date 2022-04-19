@@ -10,7 +10,7 @@ def loop(game, view, is_pc):
     if is_pc:
         start = perf_counter()
         # _, mv = minimax(game, board_evaluation, depth=3)
-        mv = mcts(game)
+        mv = mcts(game, iterations=2048)
         elapsed = perf_counter() - start
         # print(f"Minimax: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
         print(f"MCTS: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
