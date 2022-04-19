@@ -2,12 +2,8 @@ import numpy as np
 from scipy.signal import convolve2d
 
 
-def _is_over(is_max):
-    """ If the game is over, returns the score depending on the winner """
-    return np.NINF if is_max else np.PINF
-
-
-def _markers_evaluator(game, is_max, markers=8):
+def markers_evaluator(game, is_max, *, markers=8):
+    """ Evaluation based on the number of markers already placed """
     me = game.curr_player if is_max else game.prev_player
     opponent = game.prev_player if is_max else game.curr_player
 
@@ -20,14 +16,8 @@ def _markers_evaluator(game, is_max, markers=8):
     return f(my_placed, markers) - f(opponent_placed, markers)
 
 
-def markers_evaluator(game, is_max, is_over, *, markers=8):
-    """ Evaluation based on the number of markers already placed """
-    if is_over:
-        return _is_over(is_max)
-    return _markers_evaluator(game, markers)
-
-
-def _combination_evaluator(game, is_max, weight=10.0):
+def combination_evaluator(game, is_max, weight=10.0):
+    """ Evaluation of consecutive markers of the same player """
     me = game.curr_player if is_max else game.prev_player
     opponent = game.prev_player if is_max else game.curr_player
 
@@ -40,19 +30,9 @@ def _combination_evaluator(game, is_max, weight=10.0):
     return score
 
 
-def combination_evaluator(game, is_max, is_over, *, weight=10.0):
-    """ Evaluation of consecutive markers of the same player """
-    if is_over:
-        return _is_over(is_max)
-    return _combination_evaluator(game, is_max, weight)
-
-
-def mix_evaluator(game, is_max, is_over, *, markers=8, weight=10.0):
+def mix_evaluator(game, is_max, *, markers=8, weight=10.0):
     """ Better evaluation function that combines the markers already placed and their combinations """
-    if is_over:
-        return _is_over(is_max)
-
-    markers_score = _markers_evaluator(game, is_max, markers)
-    combination_score = _combination_evaluator(game, is_max, weight)
+    markers_score = markers_evaluator(game, is_max, markers=markers)
+    combination_score = combination_evaluator(game, is_max, weight=weight)
 
     return markers_score + combination_score
