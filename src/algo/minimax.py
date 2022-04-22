@@ -1,21 +1,11 @@
 import numpy as np
 from copy import deepcopy
 
-from src.logic import move
+from src.logic.operators import move
 
 
 def minimax(game, evaluator, depth, alpha=np.NINF, beta=np.PINF, *, is_max=True, **kwargs):
-    """
-    Minimax algorithm implementation with alpha-beta cuts
-    ---
-    :param game: Current game state
-    :param evaluator: Function that evaluates the game state
-    :param depth: Number of turns to see ahead
-    :param alpha: Current best value for the maximizer
-    :param beta: Current best value for the minimizer
-    :param is_max: If true tries to maximize the result otherwise tries to minimize
-    :return: Best move and the corresponding value according to the algorithm
-    """
+    """ Minimax algorithm implementation with alpha-beta cuts """
 
     if not depth:
         return evaluator(game, is_max, **kwargs), game.last_move

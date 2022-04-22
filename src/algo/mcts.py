@@ -1,7 +1,8 @@
 import numpy as np
 from copy import deepcopy
 
-from src.logic.state import move
+from src.logic.state import GameState
+from src.logic.operators import move
 
 
 class MCTSNode:
@@ -14,7 +15,7 @@ class MCTSNode:
         self.wins = 0
         self.visits = 0
 
-    def ucb1(self, ci=2):
+    def ucb1(self, ci):
         if self.visits == 0:
             return np.inf
 
@@ -68,7 +69,7 @@ class MCTSNode:
             p = p.parent
 
 
-def mcts(game, *, iterations=1024, ci=2):
+def mcts(game: GameState, *, iterations=1024, ci=2.0):
     """
     A very basic Monte Carlo Tree Search Algorithm Implementation
     The value of the nodes is based in wins and visits ratio
