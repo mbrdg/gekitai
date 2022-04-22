@@ -39,12 +39,12 @@ class GameState:
         for kernel in kernels:
             if (convolve2d(self.board == self.prev_player, kernel, mode='valid') == 3).any():
                 if verbose:
-                    print("Player {self.prev_player} has 3 connected markers")
+                    print(f"Player {self.prev_player} has 3 connected markers")
                 return True, self.prev_player
 
             if (convolve2d(self.board == self.curr_player, kernel, mode='valid') == 3).any():
                 if verbose:
-                    print("Player {self.prev_player} has 3 connected markers")
+                    print(f"Player {self.prev_player} has 3 connected markers")
                 return True, self.curr_player
 
         return False, None
