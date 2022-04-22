@@ -11,7 +11,7 @@ def markers_evaluator(game, is_max, *, markers=8):
     opponent_placed = np.count_nonzero(game.board == opponent)
 
     def f(p, m):
-        return np.inf if p - m == 0 else -m / (p - m) - 1
+        return (2 ^ 63 - 1) if p - m == 0 else -m / (p - m) - 1
 
     return f(my_placed, markers) - f(opponent_placed, markers)
 
