@@ -1,7 +1,7 @@
 import sys
 
 
-def start():
+def start_menu():
     print(f"\nWelcome to the gekitai game")
     print(f"This is part of the first project from the IA course of LEIC@FEUP")
 

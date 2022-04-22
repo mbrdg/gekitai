@@ -12,7 +12,7 @@ def minimax(game, evaluator, depth, alpha=np.NINF, beta=np.PINF, *, is_max=True,
 
     is_over, winner = game.is_over()
     if is_over:
-        score = (2 ^ 63 - 1) if not is_max and winner == game.prev_player else -(2 ^ 63 - 1)
+        score = (2 ^ 63 - 1) if not is_max and winner == game.previous_player else -(2 ^ 63 - 1)
         return score, game.last_move
 
     if is_max:

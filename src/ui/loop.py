@@ -25,7 +25,7 @@ def _run(game, algorithm, verbose=True):
 
 
 def loop(game, view, config, *, verbose=True):
-    conf = config[game.curr_player - 1]
+    conf = config[game.current_player - 1]
 
     if conf['is_pc']:
         mv = _run(game, conf['algo'], verbose)

@@ -2,11 +2,11 @@ import pygame as pg
 import sys
 
 from logic import GameState
-from ui import GameView, start, loop
+from ui import GameView, start_menu, loop
 
 
 def main():
-    config = start()
+    config = start_menu()
 
     pg.init()
     pg.display.set_caption('gekitai')

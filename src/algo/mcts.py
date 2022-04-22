@@ -52,7 +52,7 @@ class MCTSNode:
         while True:
             is_over, winner = game.is_over()
             if is_over:
-                return int(winner == self.root().state.curr_player)
+                return int(winner == self.root().state.current_player)
 
             actions = game.actions()
             random_move = np.random.randint(0, actions.shape[0], dtype=np.uint8)

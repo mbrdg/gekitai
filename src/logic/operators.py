@@ -20,8 +20,8 @@ def move(state: GameState, position):
     if state.board[i, j]:
         return state
 
-    state.board[i, j] = state.curr_player
-    state.set_markers(player=state.curr_player - 1, delta=-1)
+    state.board[i, j] = state.current_player
+    state.set_markers(player=state.current_player - 1, delta=-1)
     state.swap_player()
     state.last_move = position
 
