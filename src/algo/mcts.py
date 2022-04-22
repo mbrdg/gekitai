@@ -69,7 +69,7 @@ class MCTSNode:
             p = p.parent
 
 
-def mcts(game: GameState, *, iterations=1024, ci=2.0):
+def mcts(game: GameState, *, iterations, ci):
     """
     A very basic Monte Carlo Tree Search Algorithm Implementation
     The value of the nodes is based in wins and visits ratio
