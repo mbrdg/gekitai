@@ -52,7 +52,7 @@ class MCTSNode:
         while True:
             is_over, winner = game.is_over()
             if is_over:
-                return int(winner == self.root().state.curr_player)
+                return int(winner == self.root().state.current_player)
 
             actions = game.actions()
             random_move = np.random.randint(0, actions.shape[0], dtype=np.uint8)
@@ -69,7 +69,7 @@ class MCTSNode:
             p = p.parent
 
 
-def mcts(game: GameState, *, iterations=1024, ci=2.0):
+def mcts(game: GameState, *, iterations, ci):
     """
     A very basic Monte Carlo Tree Search Algorithm Implementation
     The value of the nodes is based in wins and visits ratio

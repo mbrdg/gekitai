@@ -1,58 +1,36 @@
 import pygame as pg
-from time import perf_counter
+import sys
 
-from logic import GameState, move
-from ui import GameView
-from algo import minimax, mcts, evaluators
-
-
-def loop(game, view, is_pc):
-    if is_pc:
-        start = perf_counter()
-        _, mv = minimax(game, evaluators.mix_evaluator, depth=3)
-        # mv = mcts(game, iterations=2048)
-        elapsed = perf_counter() - start
-        print(f"Minimax: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
-        # print(f"MCTS: Executed move {mv[0], mv[1]}, took {elapsed:.2f} secs")
-    else:
-        mv = view.read_mouse_pos()
-
-    game = move(game, position=mv)
-    view.render()
-    return game
+from logic import GameState
+from ui import GameView, start_menu, loop
 
 
 def main():
+    config = start_menu()
+
     pg.init()
-    pg.display.set_caption('G e k i t a i')
-    pg.event.set_allowed([pg.QUIT, pg.MOUSEBUTTONUP])
-
+    pg.display.set_caption('gekitai')
     screen = pg.display.set_mode(size=(800, 800))
+    pg.event.set_allowed(pg.QUIT)
 
-    game = GameState()
+    game = GameState(size=6, markers=8)
     view = GameView(game, screen)
 
-    running, is_pc = True, False
+    running = True
     while running:
+        if pg.event.peek(pg.QUIT):
+            pg.quit()
+            sys.exit(1)
 
-        if is_pc:
-            game = loop(game, view, is_pc)
-            is_pc = False
-
-        else:
-            event = pg.event.wait()
-            if event.type == pg.QUIT:
-                running = False
-            elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
-                game = loop(game, view, is_pc)
-                is_pc = True
+        game = loop(game, view, config, verbose=True)
+        view.render()
 
         is_over, winner = game.is_over(verbose=True)
         if is_over:
             print(f'Game Over! Player {winner} won!')
-            pg.time.wait(3500)
             running = False
 
+    pg.time.wait(10_000)
     pg.quit()
 
 

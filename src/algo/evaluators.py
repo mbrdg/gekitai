@@ -4,22 +4,22 @@ from scipy.signal import convolve2d
 
 def markers_evaluator(game, is_max, *, markers=8):
     """ Evaluation based on the number of markers already placed """
-    me = game.curr_player if is_max else game.prev_player
-    opponent = game.prev_player if is_max else game.curr_player
+    me = game.current_player if is_max else game.previous_player
+    opponent = game.previous_player if is_max else game.current_player
 
     my_placed = np.count_nonzero(game.board == me)
     opponent_placed = np.count_nonzero(game.board == opponent)
 
     def f(p, m):
-        return np.inf if p - m == 0 else -m / (p - m) - 1
+        return (2 ^ 63 - 1) if p - m == 0 else -m / (p - m) - 1
 
     return f(my_placed, markers) - f(opponent_placed, markers)
 
 
 def combination_evaluator(game, is_max, weight=10.0):
     """ Evaluation of consecutive markers of the same player """
-    me = game.curr_player if is_max else game.prev_player
-    opponent = game.prev_player if is_max else game.curr_player
+    me = game.current_player if is_max else game.previous_player
+    opponent = game.previous_player if is_max else game.current_player
 
     score = 0
     kernels = [np.ones(shape=(1, 2)), np.ones(shape=(2, 1)), np.eye(2), np.fliplr(np.eye(2))]
