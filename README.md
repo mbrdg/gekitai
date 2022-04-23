@@ -6,10 +6,10 @@
 
 ## Setup
 
-- This porject is meant to be run in a conda environment, however it should
+- This project is meant to be run in a conda environment, however it should
   with `pip` without any problems, just adapt `conda` commands to `pip` commands.
   
-  - In case of doubt consult the [documentation](https://docs.conda.io/projects/conda/en/latest/commands.html#conda-vs-pip-vs-virtualenv-commands).
+  - In case of doubt consult the [documentation](https://shorturl.at/qAF04).
 
 ### Dependencies
 
@@ -34,4 +34,3 @@ And that's all, now you should be able to run the project from [here](src/gekita
 - [João Sousa](mailto:up201904739@edu.fc.up.pt)
 - [Miguel Rodrigues](mailto:up201906042@edu.fe.up.pt)
 - [Ricardo Ferreira](mailto:up201907835@edu.fe.up.pt)
-
