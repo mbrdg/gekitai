@@ -23,11 +23,11 @@
 ```bash
 $ conda create --name gekitai python
 $ conda activate gekitai
-$ conda install numpy scipy pip
-$ pip install pygame
+(gekitai) $ conda install numpy scipy pip
+(gekitai) $ pip install pygame
 ```
 
-And that's all, now you should be able to run the project from `src/gekitai.py`.
+And that's all, now you should be able to run the project from [here](src/gekitai.py).
 
 ## Authors
 
