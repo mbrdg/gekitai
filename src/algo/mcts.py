@@ -70,15 +70,7 @@ class MCTSNode:
 
 
 def mcts(game: GameState, *, iterations, ci):
-    """
-    A very basic Monte Carlo Tree Search Algorithm Implementation
-    The value of the nodes is based in wins and visits ratio
-    ---
-    :param game: Current game state
-    :param iterations: Number of iterations to run the algorithm
-    :param ci: Exploration parameter for UCB1
-    :return: Most promising move according to the algorith
-    """
+    """ A very basic Monte Carlo Tree Search algorithm implementation """
 
     root = MCTSNode(game)
     for _ in range(iterations):
