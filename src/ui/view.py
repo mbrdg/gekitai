@@ -1,6 +1,5 @@
 import numpy as np
 import pygame as pg
-import os
 
 
 class MenuView:
@@ -57,7 +56,6 @@ class MenuView:
             self._screen.blit(text, (self._screen.get_width() / 2 - (text_rect[2] / 2), 200 + x * 70))
 
         pg.display.update()
-
 
 
 class GameView:

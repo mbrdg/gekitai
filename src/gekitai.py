@@ -1,8 +1,8 @@
 import pygame as pg
 import sys
 
-from logic import GameState, MenuState
-from ui import GameView, MenuView, start_menu, loop
+from logic import GameState
+from ui import GameView, MenuView, MenuState, loop
 
 
 def main():
