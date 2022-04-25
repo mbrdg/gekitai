@@ -97,7 +97,7 @@ For this game we found appropritate to implement the following algorithms:
   to order the nodes of the tree in a consistent way, e.g. many moves have the
   same evaluation values.
 
-[^2]: [Time taken to generate a move]()
+[^2]: [Time taken to generate a move](https://user-images.githubusercontent.com/64497525/165140485-0dbceb64-a4ac-4a76-81bd-d185d8719b99.png)
 
 ## Evaluation functions
 
