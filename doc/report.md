@@ -52,7 +52,7 @@ date:
 
 ## Libraries Used
 
-The project uses [python](https://www.python.org/)[^1] inside a conda env.
+The project uses [python](https://www.python.org/)[^1] inside a conda environment.
 Both built-in and external libraries were used. 
 
 - [Numpy](https://numpy.org/)
