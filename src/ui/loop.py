@@ -12,7 +12,7 @@ LEFT_BUTTON = 1
 def _run(game, algorithm, verbose=True):
     start = perf_counter()
     if algorithm == 'Minimax':
-        _, mv = minimax(game, evaluators.mix_evaluator, depth=3)
+        _, mv = minimax(game, evaluators.mix_evaluator, depth=4)
     elif algorithm == 'MCTS':
         mv = mcts(game, iterations=4096, ci=np.sqrt(2.0))
     else:
