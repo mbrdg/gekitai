@@ -27,7 +27,8 @@ class GameState:
     def actions(self, *, shuffle=True):
         actions = np.argwhere(self.board == 0)
         if shuffle:
-            np.random.shuffle(actions)
+            rng = np.random.default_rng()
+            rng.shuffle(actions)
 
         return actions
 
