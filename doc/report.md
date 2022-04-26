@@ -141,7 +141,7 @@ For this game we found appropritate to implement the following algorithms:
   backpropagation after a simulation:
 
     - `If win Then reward = 1`
-    - `If lose Then reward = -1`
+    - `If lose Then reward = 0`
 
 # Extras
 
