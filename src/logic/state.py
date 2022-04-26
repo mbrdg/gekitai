@@ -24,8 +24,12 @@ class GameState:
         x, y = self._markers
         self._markers = (x + delta, y) if player - 1 else (x, y + delta)
 
-    def actions(self):
-        return np.argwhere(self.board == 0)
+    def actions(self, *, shuffle=True):
+        actions = np.argwhere(self.board == 0)
+        if shuffle:
+            np.random.shuffle(actions)
+
+        return actions
 
     def is_over(self, verbose=False):
         # Check if after pushing there are no markers to be placed
